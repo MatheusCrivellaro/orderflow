@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OrderFlow</title>
+    <meta name="description" content="Faça pedidos e acompanhe cada etapa do processamento.">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Overpass:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/app.css">
+</head>
+<body>
+
+<header class="topbar">
+    <a class="brand" href="/">
+        <svg viewBox="0 0 40 20" aria-hidden="true">
+            <line x1="8" y1="10" x2="32" y2="10" stroke="#1F5FC4" stroke-width="5" stroke-linecap="round"/>
+            <circle cx="8" cy="10" r="6" fill="#fff" stroke="#1D2433" stroke-width="3.5"/>
+            <circle cx="32" cy="10" r="6" fill="#fff" stroke="#1D2433" stroke-width="3.5"/>
+        </svg>
+        OrderFlow
+    </a>
+    <div class="session" id="session" hidden>
+        <span class="session-email" id="session-email"></span>
+        <span class="role" id="session-role" hidden>Admin</span>
+        <button class="btn-link" id="logout" type="button">Sair</button>
+    </div>
+</header>
+
+<div class="notice-wrap">
+    <div class="notice" id="notice" role="status" aria-live="polite"></div>
+</div>
+
+<!-- Entrada -->
+<main class="auth" id="auth-view" hidden>
+    <section class="intro">
+        <h1>Peça e acompanhe cada etapa do seu pedido.</h1>
+        <p>
+            Depois que você faz um pedido, ele segue sozinho pela reserva de estoque e pelo pagamento.
+            Esta página mostra cada etapa enquanto ela acontece.
+        </p>
+
+        <div class="route demo" aria-hidden="true">
+            <span class="route-fill"></span>
+            <ol class="stops">
+                <li class="stop" style="--i:0"><span class="stop-label">Pedido recebido</span></li>
+                <li class="stop" style="--i:1"><span class="stop-label">Estoque reservado</span></li>
+                <li class="stop" style="--i:2"><span class="stop-label">Pagamento aprovado</span></li>
+                <li class="stop" style="--i:3"><span class="stop-label">Confirmado</span></li>
+            </ol>
+        </div>
+
+        <p class="demo-hint">
+            Para testar como administrador, entre com <strong>admin@orderflow.com</strong> e a senha <strong>admin123</strong>.
+        </p>
+    </section>
+
+    <section class="panel auth-panel" aria-label="Acesso">
+        <div class="tabs" role="tablist">
+            <button class="tab" type="button" role="tab" aria-selected="true" data-mode="login">Entrar</button>
+            <button class="tab" type="button" role="tab" aria-selected="false" data-mode="register">Criar conta</button>
+        </div>
+
+        <form id="auth-form" novalidate>
+            <label class="field" id="name-field" hidden>
+                <span>Nome</span>
+                <input name="name" autocomplete="name" maxlength="120">
+            </label>
+            <label class="field">
+                <span>E-mail</span>
+                <input name="email" type="email" autocomplete="email" required>
+            </label>
+            <label class="field">
+                <span>Senha</span>
+                <input name="password" type="password" autocomplete="current-password" required minlength="6">
+                <small class="field-hint" id="password-hint" hidden>Pelo menos 6 caracteres.</small>
+            </label>
+            <p class="form-error" id="auth-error" role="alert" hidden></p>
+            <button class="btn btn-primary btn-block" type="submit" id="auth-submit">Entrar</button>
+        </form>
+    </section>
+</main>
+
+<!-- Aplicação -->
+<main class="app" id="app-view" hidden>
+    <section class="catalog" aria-labelledby="catalog-title">
+        <h2 id="catalog-title">Produtos</h2>
+        <ul class="product-list" id="product-list"></ul>
+
+        <details class="admin-panel" id="admin-panel" hidden>
+            <summary>Cadastrar novo produto</summary>
+            <form id="product-form" class="product-form">
+                <label class="field field-wide">
+                    <span>Nome</span>
+                    <input name="name" required maxlength="120">
+                </label>
+                <label class="field field-wide">
+                    <span>Descrição</span>
+                    <input name="description" maxlength="500">
+                </label>
+                <label class="field">
+                    <span>Preço (R$)</span>
+                    <input name="price" type="number" min="0.01" step="0.01" required inputmode="decimal">
+                </label>
+                <label class="field">
+                    <span>Estoque</span>
+                    <input name="stock" type="number" min="0" step="1" required inputmode="numeric">
+                </label>
+                <button class="btn btn-primary" type="submit">Cadastrar produto</button>
+            </form>
+        </details>
+    </section>
+
+    <aside class="cart" aria-labelledby="cart-title">
+        <h2 id="cart-title">Carrinho</h2>
+        <ul class="cart-list" id="cart-list"></ul>
+        <p class="cart-empty" id="cart-empty">Adicione produtos da lista para montar o pedido.</p>
+        <div class="cart-total">
+            <span>Total</span>
+            <strong id="cart-total">R$ 0,00</strong>
+        </div>
+        <p class="cart-warning" id="cart-warning" hidden>
+            O pagamento de teste recusa pedidos acima de R$ 5.000,00. Este pedido será cancelado e o estoque devolvido.
+        </p>
+        <button class="btn btn-primary btn-block" type="button" id="place-order" disabled>Fazer pedido</button>
+    </aside>
+
+    <section class="orders" aria-labelledby="orders-title">
+        <h2 id="orders-title">Seus pedidos</h2>
+        <p class="orders-help">
+            O estoque é reservado primeiro e o pagamento vem em seguida. A lista se atualiza sozinha enquanto houver pedido em andamento.
+        </p>
+        <ol class="order-list" id="order-list"></ol>
+        <p class="orders-empty" id="orders-empty">Nenhum pedido ainda. Monte um carrinho e faça o primeiro.</p>
+    </section>
+</main>
+
+<script src="/app.js"></script>
+</body>
+</html>

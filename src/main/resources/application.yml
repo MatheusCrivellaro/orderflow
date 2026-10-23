@@ -1,0 +1,65 @@
+spring:
+  application:
+    name: orderflow
+
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/orderflow}
+    username: ${DB_USERNAME:orderflow}
+    password: ${DB_PASSWORD:orderflow}
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_batch_fetch_size: 20
+
+  flyway:
+    enabled: true
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9094}
+    producer:
+      acks: all
+      properties:
+        enable.idempotence: true
+    consumer:
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+    listener:
+      ack-mode: record
+
+app:
+  jwt:
+    # Em produção, defina JWT_SECRET com no mínimo 32 caracteres
+    secret: ${JWT_SECRET:orderflow-dev-secret-key-change-me-in-production-123456}
+    expiration-minutes: 60
+  admin:
+    email: ${ADMIN_EMAIL:admin@orderflow.com}
+    password: ${ADMIN_PASSWORD:admin123}
+  payment:
+    # Pedidos acima desse valor são recusados pelo pagamento simulado
+    approval-limit: 5000.00
+  outbox:
+    publish-interval-ms: 500
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+
+logging:
+  level:
+    com.matheus.orderflow: INFO
+    org.apache.kafka: WARN
