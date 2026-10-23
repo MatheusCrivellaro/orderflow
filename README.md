@@ -441,4 +441,10 @@ docker compose up -d postgres kafka kafka-ui
 
 Feito por **[Matheus Crivellaro](https://github.com/MatheusCrivellaro)** como projeto de portfólio.
 
+<sub>
+Usei o Claude (Anthropic) como assistente para acelerar a entrega e as partes repetitivas e trabalhosas,
+como código boilerplate, testes e documentação. A arquitetura, a escolha das tecnologias e as decisões
+técnicas do projeto foram minhas.
+</sub>
+
 </div>
