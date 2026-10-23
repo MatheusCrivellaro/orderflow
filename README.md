@@ -2,10 +2,9 @@
 
 # OrderFlow
 
-**Sistema de pedidos com processamento assíncrono orientado a eventos**
-
-Você faz o pedido, recebe a resposta na hora, e a reserva de estoque, o pagamento e a notificação
-acontecem em segundo plano, conversando por mensagens no **Apache Kafka**.
+API REST de pedidos em **Spring Boot 4** com processamento assíncrono orientado a eventos.
+Estoque, pagamento e notificação são consumers **Apache Kafka** independentes, coordenados por uma
+saga coreografada com **Transactional Outbox** e consumers idempotentes.
 
 [![CI](https://github.com/MatheusCrivellaro/orderflow/actions/workflows/ci.yml/badge.svg)](https://github.com/MatheusCrivellaro/orderflow/actions/workflows/ci.yml)
 ![Java 21](https://img.shields.io/badge/Java-21-E76F00?logo=openjdk&logoColor=white)
@@ -15,24 +14,7 @@ acontecem em segundo plano, conversando por mensagens no **Apache Kafka**.
 ![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
 ![Cobertura](https://img.shields.io/badge/cobertura-95%25-brightgreen)
 
-<img src="docs/images/pedidos.png" alt="Tela de pedidos do OrderFlow mostrando um pedido em andamento, um cancelado e um confirmado" width="820">
-
 </div>
-
----
-
-## Sumário
-
-- [Sobre o projeto](#sobre-o-projeto)
-- [Como funciona](#como-funciona)
-- [Tecnologias](#tecnologias)
-- [Teste você mesmo em 5 minutos](#teste-você-mesmo-em-5-minutos)
-- [Documentação da API](#documentação-da-api)
-- [Testes automatizados](#testes-automatizados)
-- [Decisões de arquitetura](#decisões-de-arquitetura)
-- [Estrutura do projeto](#estrutura-do-projeto)
-- [Configuração](#configuração)
-- [Problemas comuns](#problemas-comuns)
 
 ---
 
@@ -57,6 +39,12 @@ avançando pelas etapas em tempo real.
 - Ver um pedido ser recusado e o estoque ser devolvido automaticamente
 - Como administrador, cadastrar produtos e ver os pedidos de todos os clientes
 - Inspecionar as mensagens que passam pelo Kafka no Kafka UI
+
+<div align="center">
+<img src="docs/images/pedidos.png" alt="Tela de pedidos do OrderFlow mostrando um pedido em andamento, um cancelado e um confirmado" width="820">
+<br>
+<sub>Interface web: um pedido em andamento, um recusado no pagamento e um confirmado.</sub>
+</div>
 
 ---
 
@@ -431,6 +419,21 @@ docker compose up -d postgres kafka kafka-ui
 | `Cannot connect to the Docker daemon` | Abra o Docker Desktop e espere ele terminar de iniciar. |
 | A página abre, mas o pedido não sai de `PENDING` | Veja se o Kafka está saudável com `docker compose ps` e confira o log com `docker compose logs app`. |
 | Testes de integração falham com erro de Docker | Os testes usam Testcontainers e precisam do Docker rodando. |
+
+---
+
+## Sumário
+
+- [Sobre o projeto](#sobre-o-projeto)
+- [Como funciona](#como-funciona)
+- [Tecnologias](#tecnologias)
+- [Teste você mesmo em 5 minutos](#teste-você-mesmo-em-5-minutos)
+- [Documentação da API](#documentação-da-api)
+- [Testes automatizados](#testes-automatizados)
+- [Decisões de arquitetura](#decisões-de-arquitetura)
+- [Estrutura do projeto](#estrutura-do-projeto)
+- [Configuração](#configuração)
+- [Problemas comuns](#problemas-comuns)
 
 ---
 
